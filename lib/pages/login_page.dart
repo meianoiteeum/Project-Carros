@@ -1,4 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutterapp/controller/login_api.dart';
+import 'package:flutterapp/model/response/api_response.dart';
+import 'package:flutterapp/pages/home_page.dart';
+import 'package:flutterapp/utils/alerts.dart';
+import 'package:flutterapp/utils/nav.dart';
+import 'package:flutterapp/widget/app_button.dart';
+import 'package:flutterapp/widget/app_text.dart';
+
 
 // ignore: must_be_immutable
 class LoginPage extends StatefulWidget {
@@ -7,10 +15,11 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _tfLogin = new TextEditingController();
-  final _tfSenha = new TextEditingController();
+  final _tfLogin = new TextEditingController(text: "MARIO.CEZAR@GMAIL.COM");
+  final _tfSenha = new TextEditingController(text: "123@nM34");
   final _formKey = GlobalKey<FormState>();
   final _focusSenha = FocusNode();
+  bool _showProgress = false;
 
   @override
   Widget build(BuildContext context) {
@@ -32,17 +41,14 @@ class _LoginPageState extends State<LoginPage> {
         padding: EdgeInsets.all(16),
         child: ListView(
           children: <Widget>[
-            _text(
-              "Login",
-              "Digite o login",
-              controller: _tfLogin,
-              validator: _validatelogin,
-              keyboardType: TextInputType.emailAddress,
-              textInputAction: TextInputAction.next,
-              nextFocus: _focusSenha
-            ),
+            AppText("Login", "Digite o login",
+                controller: _tfLogin,
+                validator: _validatelogin,
+                keyboardType: TextInputType.emailAddress,
+                textInputAction: TextInputAction.next,
+                nextFocus: _focusSenha),
             SizedBox(height: 10),
-            _text(
+            AppText(
               "Senha",
               "Digite a senha",
               password: true,
@@ -52,66 +58,39 @@ class _LoginPageState extends State<LoginPage> {
               focusNode: _focusSenha,
             ),
             SizedBox(height: 10),
-            _button("Login", _onClickLogin),
+            AppButton(
+              "Login",
+              onPressed: _onClickLogin,
+              showProgress: _showProgress,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Container _button(String text, Function onPressed) {
-    return Container(
-      height: 46,
-      child: RaisedButton(
-        color: Colors.blue,
-        onPressed: onPressed,
-        child: Text(
-          text,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 22,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _text(
-    String label,
-    String hint, {
-    bool password = false,
-    TextEditingController controller,
-    FormFieldValidator<String> validator,
-    TextInputType keyboardType,
-    TextInputAction textInputAction,
-    FocusNode focusNode,
-        FocusNode nextFocus,
-  }) {
-    return TextFormField(
-      controller: controller,
-      obscureText: password,
-      validator: validator,
-      keyboardType: keyboardType,
-      textInputAction: textInputAction,
-      focusNode: focusNode,
-      onFieldSubmitted: (String text){
-        if(nextFocus != null)
-          FocusScope.of(context).requestFocus(_focusSenha);
-      },
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-      ),
-    );
-  }
-
-  void _onClickLogin() {
+  void _onClickLogin() async {
     bool formOk = _formKey.currentState.validate();
     if (!formOk) return;
 
     String login = _tfLogin.text;
     String senha = _tfSenha.text;
-    print("Login: $login, Senha: $senha");
+
+    setState(() { // só usa no stateful e serve para redesenhar a tela novamente
+      _showProgress = true;
+    });
+
+    ApiResponse response = await LoginApi.login(login, senha);
+
+    if (response.ok) {
+      push(context, HomePage(), replace: true);
+    } else {
+      toastAlert(response.msg);
+    }
+
+    setState(() { // só usa no stateful e serve para redesenhar a tela novamente
+      _showProgress = false;
+    });
   }
 
   String _validatelogin(String text) {
