@@ -1,19 +1,16 @@
 import 'package:flutterapp/model/response/api_response.dart';
 import 'package:flutterapp/model/response/response.dart';
-import 'package:flutterapp/model/user.dart';
+import 'package:flutterapp/model/usuario.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class LoginApi {
   static Future<ApiResponse> login(String login, String senha) async {
     try {
-      var url = 'http://172.100.10.101:8141/user/login';
+      var url = 'https://carros-springboot.herokuapp.com/api/v2/login';
 
-      final params = {"login": login, "password": senha};
-      final Map<String, String> header = {
-        "Content-Type": "application/json",
-        "charset": "utf-8"
-      };
+      final params = {"username": login, "password": senha};
+      final Map<String, String> header = {"Content-Type": "application/json"};
 
       var response = await http.post(
         url,
@@ -21,12 +18,12 @@ class LoginApi {
         headers: header,
       );
 
-      String body = utf8.decode(response.body.codeUnits);
+//      String body = utf8.decode(response.body.codeUnits);
 
-      Map map = json.decode(body);
+      Map map = json.decode(response.body);
 
       if (response.statusCode == 200) {
-        return ApiResponse.ok(User.fromJson(map));
+        return ApiResponse.ok(Usuario.fromJson(map));
       }
       return ApiResponse.error(Response.fromJson(map));
     } catch (error, exception) {

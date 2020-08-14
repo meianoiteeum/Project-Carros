@@ -15,8 +15,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _tfLogin = new TextEditingController(text: "MARIO.CEZAR@GMAIL.COM");
-  final _tfSenha = new TextEditingController(text: "123@nM34");
+  final _tfLogin = new TextEditingController(text: "user");
+  final _tfSenha = new TextEditingController(text: "123");
   final _formKey = GlobalKey<FormState>();
   final _focusSenha = FocusNode();
   bool _showProgress = false;

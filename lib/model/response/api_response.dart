@@ -11,7 +11,7 @@ class ApiResponse<T>{
 
   ApiResponse.error(this.result){
     Response response = this.result as Response;
-    this.msg = response.errors.message;
+    this.msg = response.error;
     ok = false;
   }
 }
