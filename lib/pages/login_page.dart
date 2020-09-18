@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutterapp/controller/login_api.dart';
 import 'package:flutterapp/model/response/api_response.dart';
+import 'package:flutterapp/model/usuario.dart';
 import 'package:flutterapp/pages/home_page.dart';
 import 'package:flutterapp/utils/alerts.dart';
 import 'package:flutterapp/utils/nav.dart';
+import 'package:flutterapp/utils/prefs.dart';
 import 'package:flutterapp/widget/app_button.dart';
 import 'package:flutterapp/widget/app_text.dart';
-
+import 'package:flutter/scheduler.dart' show timeDilation;
 
 // ignore: must_be_immutable
 class LoginPage extends StatefulWidget {
@@ -20,6 +22,22 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _focusSenha = FocusNode();
   bool _showProgress = false;
+  bool _rememberLogin = false;
+
+  @override
+  void initState() {
+    super.initState();
+      Future<Usuario> future = Usuario.get();
+      future.then((Usuario user) => {
+      if(user != null)
+        push(context, HomePage(), replace:true)
+      });
+  }
+
+  void getRememberLogin() async{
+    Future<bool> remebem = Prefs.getBool("rememberLogin");
+    remebem.then((value) => _rememberLogin = value);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +76,19 @@ class _LoginPageState extends State<LoginPage> {
               focusNode: _focusSenha,
             ),
             SizedBox(height: 10),
+            CheckboxListTile(
+              title: const Text(
+                "Login automático?",
+                textAlign: TextAlign.right,
+              ),
+              value: timeDilation != 1.0,
+              onChanged: (value) {
+                setState(() {
+                  timeDilation = value ? 2.0 : 1.0;
+                });
+              },
+            ),
+            SizedBox(height: 10),
             AppButton(
               "Login",
               onPressed: _onClickLogin,
@@ -76,7 +107,8 @@ class _LoginPageState extends State<LoginPage> {
     String login = _tfLogin.text;
     String senha = _tfSenha.text;
 
-    setState(() { // só usa no stateful e serve para redesenhar a tela novamente
+    setState(() {
+      // só usa no stateful e serve para redesenhar a tela novamente
       _showProgress = true;
     });
 
@@ -88,7 +120,8 @@ class _LoginPageState extends State<LoginPage> {
       toastAlert(response.msg);
     }
 
-    setState(() { // só usa no stateful e serve para redesenhar a tela novamente
+    setState(() {
+      // só usa no stateful e serve para redesenhar a tela novamente
       _showProgress = false;
     });
   }

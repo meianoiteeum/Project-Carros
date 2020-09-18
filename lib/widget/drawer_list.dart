@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutterapp/model/usuario.dart';
 import 'package:flutterapp/pages/login_page.dart';
 import 'package:flutterapp/utils/nav.dart';
 
 class DrawerList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    Future<Usuario> future = Usuario.get();
     return Drawer(
       child: ListView(
         children: <Widget>[
           FlutterLogo(
             size: 30,
           ),
-          UserAccountsDrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.blue,
-            ),
-            accountName: Text("Guilherme Costa"),
-            accountEmail: Text("tfguilherme.07@gmail.com"),
-            currentAccountPicture: Image.asset("assets/images/catinho_1.jpg"),
+          FutureBuilder<Usuario>(
+            future: future,
+            builder: (context, snapshot){
+              Usuario user = snapshot.data;
+              return user != null ? _header(user) : Container();
+            },
           ),
           ListTile(
             leading: Icon(Icons.star),
@@ -43,7 +44,22 @@ class DrawerList extends StatelessWidget {
     );
   }
 
+  UserAccountsDrawerHeader _header(Usuario user) {
+    return UserAccountsDrawerHeader(
+          decoration: BoxDecoration(
+            color: Colors.blue,
+          ),
+          accountName: Text(user.nome),
+          accountEmail: Text(user.email),
+          currentAccountPicture: CircleAvatar(
+            backgroundImage: NetworkImage(user.urlFoto),
+          ),
+          // currentAccountPicture: Image.asset(user.urlFoto),
+        );
+  }
+
   onTapPage1(context) {
+    Usuario.delete();
     push(context, LoginPage(), replace: true);
   }
 }

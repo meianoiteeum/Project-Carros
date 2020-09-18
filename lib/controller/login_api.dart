@@ -18,12 +18,12 @@ class LoginApi {
         headers: header,
       );
 
-//      String body = utf8.decode(response.body.codeUnits);
-
       Map map = json.decode(response.body);
 
       if (response.statusCode == 200) {
-        return ApiResponse.ok(Usuario.fromJson(map));
+        final user = Usuario.fromJson(map);
+        user.save();
+        return ApiResponse.ok(user);
       }
       return ApiResponse.error(Response.fromJson(map));
     } catch (error, exception) {

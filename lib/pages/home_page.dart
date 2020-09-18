@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutterapp/controller/carro_api.dart';
 import 'package:flutterapp/model/carro.dart';
+import 'package:flutterapp/model/usuario.dart';
 import 'package:flutterapp/utils/nav.dart';
 import 'package:flutterapp/utils/prefs.dart';
 import 'package:flutterapp/widget/carros_listView.dart';

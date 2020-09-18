@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:flutterapp/utils/prefs.dart';
+
 class Usuario {
   int id;
   String login;
@@ -43,4 +47,20 @@ class Usuario {
     return 'User{id: $id, login: $login, nome: $nome, email: $email, urlFoto: $urlFoto, token: $token, roles: $roles}';
   }
 
+  void save() {
+    Map map = toJson();
+    String json = jsonEncode(map);
+    Prefs.setString("user.prefs", json);
+  }
+
+  static void delete(){
+    Prefs.setString("user.prefs", "");
+  }
+
+  static Future<Usuario> get() async{
+    String json = await Prefs.getString("user.prefs");
+    if(json.isEmpty)
+      return null;
+    return Usuario.fromJson(jsonDecode(json));
+  }
 }
